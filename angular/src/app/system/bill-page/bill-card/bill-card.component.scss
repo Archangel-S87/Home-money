@@ -1,0 +1,14 @@
+.stat-col {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.stats {
+  .stat-icon {
+    margin-left: 10px;
+  }
+  .stat {
+    display: flex;
+    align-items: center;
+  }
+}

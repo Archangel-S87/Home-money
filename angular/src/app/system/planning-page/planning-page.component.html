@@ -1,0 +1,43 @@
+<div class="title-block">
+    <h3 class="title">
+        Страница планирования <span class="sparkline bar"></span>
+    </h3>
+</div>
+
+<section class="section">
+    <div *ngIf="!isLoaded">loading...</div>
+    <div class="row" *ngIf="isLoaded">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header card-header-sm bordered">
+                    <div class="header-block">
+                        <h3 class="title">Расходы</h3>
+                    </div>
+                    <h5 class="planning-expenses pull-right">
+                        Общий остаток: <span class="text-success">{{bill.value | currency: 'BYN '}}</span>
+                    </h5>
+                </div>
+                <div class="card-block">
+                    <div class="row" *ngFor="let cat of categories">
+                        <div class="col-xs-6">
+                            <div class="n-progress">
+                                <div class="progress-bar {{getCategoryColorClass(cat)}}" [ngStyle]="{width: getCategoryPercent(cat)}">
+                                    <span>{{cat.name}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-6">
+                            <p>
+                                <span class="text-{{getCategoryColorClass(cat)}}">{{getCategoryCost(cat) | currency: ' '}}</span>
+                                из
+                                <span class="text-primary">{{cat.capacity | currency: ' '}}</span>
+                                |
+                                осталось <span class="text-{{getCategoryColorClass(cat)}}">{{cat.capacity - getCategoryCost(cat) | currency: ' '}}</span> (руб.)
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

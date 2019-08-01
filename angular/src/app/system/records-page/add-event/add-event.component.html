@@ -1,0 +1,81 @@
+<div class="card">
+    <div class="card-header bordered">
+        <div class="header-block">
+            <h3 class="title">Добавить событие</h3>
+        </div>
+    </div>
+    <div class="card-block">
+        <div class="alert alert-{{message.type}}" *ngIf="message.text">{{message.text}}</div>
+        <form #form="ngForm" (ngSubmit)="onSubmit(form)">
+            <div class="form-group">
+                <label class="control-label" for="category">Выберите категорию</label>
+                <select
+                        class="form-control"
+                        id="category"
+                        required
+                        [ngModel]="currentCategoryId"
+                        name="category"
+                >
+                    <option *ngFor="let cat of categories" [value]="cat.id">{{cat.name}}</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Выберите тип</label>
+                <div *ngFor="let type of types">
+                    <label>
+                        <input
+                                class="radio"
+                                name="type"
+                                type="radio"
+                                [value]="type.type"
+                                required
+                                [ngModel]="'outcome'"
+                        >
+                        <span>{{type.label}}</span>
+                    </label>
+                </div>
+            </div>
+            <div
+                    class="form-group"
+                    [ngClass]="{'has-error': amount.invalid && amount.touched}"
+            >
+                <label class="control-label" for="amount">Введите сумму</label>
+                <input
+                        type="number"
+                        class="form-control"
+                        id="amount"
+                        name="amount"
+                        [ngModel]="0"
+                        required
+                        min="1"
+                        #amount="ngModel"
+                >
+                <span
+                        class="form-help-text"
+                        *ngIf="amount.invalid && amount.touched"
+                >Поле не может быть пустым и должно быть числом</span>
+            </div>
+            <div
+                    class="form-group"
+                    [ngClass]="{'has-error': description.invalid && description.touched}"
+            >
+                <label class="control-label" for="description">Введите описание</label>
+                <input
+                        type="text"
+                        class="form-control"
+                        id="description"
+                        name="description"
+                        ngModel
+                        required
+                        minlength="3"
+                        #description="ngModel"
+                >
+                <span
+                        class="form-help-text"
+                        *ngIf="description.invalid && description.touched"
+                >Поле не может быть пустым и должно быть не менее 3 символов</span>
+            </div>
+            <button type="submit" class="btn btn-primary" [disabled]="form.invalid">Добавить</button>
+        </form>
+    </div>
+</div>
