@@ -14,6 +14,8 @@
         "symfony/framework-bundle": "4.3.*",
         "symfony/maker-bundle": "^1.12",
         "symfony/orm-pack": "^1.0",
+        "symfony/security": "4.3.*",
+        "symfony/security-bundle": "4.3.*",
         "symfony/yaml": "4.3.*"
     },
     "require-dev": {
