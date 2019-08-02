@@ -3,20 +3,18 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use FOS\RestBundle\Controller\Annotations as Rest;
+use Symfony\Component\Routing\Annotation\Route;
 
-class UserController extends AbstractController
+class SystemController extends AbstractController
 {
-
     /**
-     * @Rest\Get("/users", name="users")
+     * @Route("/system", name="system")
      */
     public function index()
     {
         return $this->json([
             'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/UserController.php',
+            'path' => 'src/Controller/SystemController.php',
         ]);
     }
-
 }
