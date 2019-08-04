@@ -4,6 +4,8 @@ import {Router} from '@angular/router';
 
 import {UserService} from '../../shared/services/user.service';
 import {User} from '../../shared/models/user.model';
+import {Subscription} from "rxjs";
+import {error} from "selenium-webdriver";
 
 @Component({
   selector: 'wfm-registration',
@@ -12,12 +14,14 @@ import {User} from '../../shared/models/user.model';
 })
 export class RegistrationComponent implements OnInit {
 
-  form: FormGroup;
+  private form: FormGroup;
 
-  constructor(private userService: UserService, private router: Router) {
-  }
+  protected currencies: string[] = [];
+
+  constructor(private userService: UserService, private router: Router) {}
 
   ngOnInit() {
+    this.getCurrencies();
     this.form = new FormGroup({
       email: new FormControl(null, [
         Validators.required,
@@ -30,22 +34,26 @@ export class RegistrationComponent implements OnInit {
         Validators.minLength(6)
       ]),
       name: new FormControl(null, [Validators.required]),
+      currency: new FormControl(null, [Validators.required]),
       agree: new FormControl(false, [Validators.requiredTrue])
     });
   }
 
   onSubmit() {
-    console.log(this.form);
-    const {email, password, name} = this.form.value;
-    const user = new User(email, password, name);
+    const {email, password, name, currency} = this.form.value;
+    const user = new User(email, password, name, null, null, currency);
     this.userService
       .createNewUser(user)
-      .subscribe(() => {
-        return this.router.navigate(['/login'], {
-          queryParams: {
-            nowCanLogin: true
-          }
-        });
+      .subscribe((responce: {errors: boolean, properties: {}}) => {
+        if (responce.errors) {
+          this.setErrors(responce.properties);
+        } else {
+          return this.router.navigate(['/login'], {
+            queryParams: {
+              nowCanLogin: true
+            }
+          });
+        }
       });
   }
 
@@ -53,8 +61,36 @@ export class RegistrationComponent implements OnInit {
     return new Promise((resolve) => {
       this.userService
         .getUserByEmail(control.value)
-        .subscribe((user: User) => resolve(user ? {forbiddenEmail: true} : null));
+        .subscribe((responce) => resolve(responce.is_email ? {forbiddenEmail: true} : null));
     });
+  }
+
+  private getCurrencies(): any {
+    this.userService
+        .getCurrencies()
+        .subscribe((currencies) => {
+          this.currencies = currencies;
+        });
+  }
+
+  private setErrors(fields): void {
+
+    for (let key in fields) {
+
+      const field = this.form.get(key),
+          messages = fields[key]['messages'],
+          errors = {};
+
+      if (!field || messages.isArray) return;
+
+      for (let error in messages) {
+        errors[error] = true;
+      }
+
+      field.setErrors(errors);
+
+    }
+
   }
 
 }

@@ -1,7 +1,6 @@
-import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {map} from 'rxjs/operators';
 
 import {User} from '../models/user.model';
 import {BaseApi} from '../core/base-api';
@@ -13,13 +12,20 @@ export class UserService extends BaseApi {
     super(http);
   }
 
-  getUserByEmail(email: string): Observable<User> {
-    return this.get('users?email=' + email)
-      .pipe(map((user: User[]) => user[0] ? user[0] : undefined));
+  login(email: string, password: string): Observable<{}>  {
+    return this.get('login', {email, password});
   }
 
-  createNewUser(user: User) {
-    return this.post('users', user);
+  getUserByEmail(email: string): Observable<{errors: boolean, is_email: boolean}> {
+    return this.get('is-email', {email});
+  }
+
+  createNewUser(user: User): Observable<{}> {
+    return this.get('registration', user);
+  }
+
+  getCurrencies(): Observable<string[]> {
+    return this.get('currencies');
   }
 
 }

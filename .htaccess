@@ -16,3 +16,8 @@ RewriteRule ^(.+)/$  /$1 [R=301,L]
 RewriteCond %{REQUEST_URI} ^/api.*$
 RewriteRule ^api.*$ public/ [L,QSA]
 RewriteRule ^(.*)$ public/app/$1 [L,QSA]
+
+# Разрешаю доступ с localhost-а
+Header add Access-Control-Allow-Origin: http://localhost:4200
+Header add Access-Control-Allow-Methods: POST,GET,OPTIONS,DELETE,PUT
+Header add Access-Control-Allow-Headers: X-Requested-With,Content-Type,Origin,Authorization,Accept,Client-Security-Token,Accept-Encoding

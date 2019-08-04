@@ -55,23 +55,35 @@ export class LoginComponent implements OnInit {
   }
 
   onSubmit() {
+
     const formData: User = this.form.value;
+
     this.userService
-      .getUserByEmail(formData.email)
+      .login(formData.email, formData.password)
       .subscribe((user: User) => {
+
         if (user) {
+
           if (user.password === formData.password) {
+
             this.message.text = '';
             window.localStorage.setItem('user', JSON.stringify(user));
             this.authService.login();
             return this.router.navigate(['/system', 'bill']);
+
           } else {
+
             this.showMessage({text: `Неверный проль`, type: 'danger'});
+
           }
         } else {
+
           this.showMessage({text: `Такого пользователя не существует`, type: 'danger'});
+
         }
+
       });
+
   }
 
 }
