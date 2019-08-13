@@ -1,19 +1,13 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {Currency} from '../../shared/model/currency.model';
+import {Component, Input} from '@angular/core';
+import {CurrenciesRates} from "../../../shared/types";
 
 @Component({
   selector: 'wfm-currency-card',
   templateUrl: './currency-card.component.html',
   styleUrls: ['./currency-card.component.scss']
 })
-export class CurrencyCardComponent implements OnInit {
+export class CurrencyCardComponent {
 
-  @Input() currency: Currency[];
-
-  constructor() {}
-
-  ngOnInit() {
-
-  }
+  @Input() currenciesRates: CurrenciesRates;
 
 }

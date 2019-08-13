@@ -5,10 +5,11 @@
         <h4 class="title">Счет</h4>
       </div>
       <div class="row row-sm stats-container">
-        <div class="col-xs-12 stat-col">
-          <div class="stat-icon">BYN</div>
+
+        <div class="col-xs-12 stat-col" *ngFor="let val of bills">
+          <div class="stat-icon">{{val.name}}</div>
           <div class="stat">
-            <div class="value">{{bill.value | currency: ' '}}</div>
+            <div class="value" [ngClass]="{'current-currency': val.active}">{{val.val | currency: ' '}}</div>
           </div>
           <progress class="progress stat-progress" value="100" max="100">
             <span class="progress">
@@ -16,28 +17,7 @@
             </span>
           </progress>
         </div>
-        <div class="col-xs-12 stat-col">
-          <div class="stat-icon">RUB</div>
-          <div class="stat">
-            <div class="value">{{RUB | currency: ' '}}</div>
-          </div>
-          <progress class="progress stat-progress" value="100" max="100">
-            <span class="progress">
-              <span class="progress-bar" style="width: 100%;"></span>
-            </span>
-          </progress>
-        </div>
-        <div class="col-xs-12 stat-col">
-          <div class="stat-icon">USD</div>
-          <div class="stat">
-            <div class="value">{{USD | currency: ' '}}</div>
-          </div>
-          <progress class="progress stat-progress" value="100" max="100">
-            <span class="progress">
-              <span class="progress-bar" style="width: 100%;"></span>
-            </span>
-          </progress>
-        </div>
+
       </div>
     </div>
   </div>

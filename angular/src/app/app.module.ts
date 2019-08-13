@@ -9,7 +9,8 @@ import {HttpClientModule} from '@angular/common/http';
 import {AuthService} from './shared/services/auth.service';
 import {SystemModule} from './system/system.module';
 import {FormsModule} from '@angular/forms';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {LocalStorageService} from "./shared/services/localStorage.service";
 
 @NgModule({
   declarations: [
@@ -24,8 +25,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     SystemModule,
     BrowserAnimationsModule
   ],
-  providers: [UserService, AuthService],
-  bootstrap: [AppComponent]
+  providers: [UserService, AuthService, LocalStorageService],
+  bootstrap: [AppComponent],
 })
 export class AppModule {
 }

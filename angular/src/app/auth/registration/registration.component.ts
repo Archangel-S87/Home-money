@@ -3,9 +3,8 @@ import {AbstractControl, FormControl, FormGroup, ValidationErrors, Validators} f
 import {Router} from '@angular/router';
 
 import {UserService} from '../../shared/services/user.service';
-import {User} from '../../shared/models/user.model';
-import {Subscription} from "rxjs";
-import {error} from "selenium-webdriver";
+import {User} from "../../shared/types";
+import {LocalStorageService} from "../../shared/services/localStorage.service";
 
 @Component({
   selector: 'wfm-registration',
@@ -33,7 +32,10 @@ export class RegistrationComponent implements OnInit {
         Validators.required,
         Validators.minLength(6)
       ]),
-      name: new FormControl(null, [Validators.required]),
+      name: new FormControl(null, [
+        Validators.required,
+        Validators.minLength(3)
+      ]),
       currency: new FormControl(null, [Validators.required]),
       agree: new FormControl(false, [Validators.requiredTrue])
     });
@@ -41,12 +43,13 @@ export class RegistrationComponent implements OnInit {
 
   onSubmit() {
     const {email, password, name, currency} = this.form.value;
-    const user = new User(email, password, name, null, null, currency);
+    const user: User = {email, password, name, currency};
     this.userService
       .createNewUser(user)
-      .subscribe((responce: {errors: boolean, properties: {}}) => {
-        if (responce.errors) {
-          this.setErrors(responce.properties);
+      .subscribe((response) => {
+        if (response) {
+          // Есть ошибки
+          this.setErrors(response);
         } else {
           return this.router.navigate(['/login'], {
             queryParams: {
@@ -61,7 +64,7 @@ export class RegistrationComponent implements OnInit {
     return new Promise((resolve) => {
       this.userService
         .getUserByEmail(control.value)
-        .subscribe((responce) => resolve(responce.is_email ? {forbiddenEmail: true} : null));
+        .subscribe((response) => resolve(response.data.is_email ? {forbiddenEmail: true} : null));
     });
   }
 
@@ -69,7 +72,8 @@ export class RegistrationComponent implements OnInit {
     this.userService
         .getCurrencies()
         .subscribe((currencies) => {
-          this.currencies = currencies;
+          this.currencies = currencies.data.currencies;
+          LocalStorageService.set('currencies', this.currencies);
         });
   }
 

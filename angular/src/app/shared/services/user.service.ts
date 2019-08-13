@@ -1,31 +1,45 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 
-import {User} from '../models/user.model';
 import {BaseApi} from '../core/base-api';
+import {ApiResponse, User} from "../types";
 
 @Injectable()
 export class UserService extends BaseApi {
 
-  constructor(protected http: HttpClient) {
-    super(http);
-  }
-
-  login(email: string, password: string): Observable<{}>  {
+  login(email: string, password: string): Observable<ResponseAuth> {
     return this.get('login', {email, password});
   }
 
-  getUserByEmail(email: string): Observable<{errors: boolean, is_email: boolean}> {
+  getUserByEmail(email: string): Observable<IsEmail> {
     return this.get('is-email', {email});
   }
 
-  createNewUser(user: User): Observable<{}> {
+  createNewUser(user: User): Observable<ResponseAuth> {
     return this.get('registration', user);
   }
 
-  getCurrencies(): Observable<string[]> {
+  getCurrencies(): Observable<Currencies> {
     return this.get('currencies');
   }
 
+}
+
+export class Currencies extends ApiResponse {
+  data: {
+    currencies: string[]
+  }
+}
+
+class ResponseAuth extends ApiResponse {
+  data: {
+    message?: string,
+    user?: User
+  }
+}
+
+class IsEmail extends ApiResponse {
+  data: {
+    is_email?: boolean,
+  }
 }

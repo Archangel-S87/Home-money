@@ -3,19 +3,18 @@
 namespace App\Entity;
 
 use App\Controller\AuthController;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
-use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @ORM\Table(name="users")
- * @UniqueEntity(fields="email", message="Не уникальный email", payload="forbiddenEmail")
+ * @UniqueEntity(fields={"email", "apiToken"}, message="Не уникальный email", payload="forbiddenEmail")
  */
 class User implements UserInterface
 {
-
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -27,9 +26,31 @@ class User implements UserInterface
      * @Assert\NotBlank(message="email не может быть пустым")
      * @Assert\Length(min=3, minMessage="email не может быть менее {{ limit }} символов")
      * @Assert\Email(message = "Введите коректный email")
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=180, unique=true)
      */
     private $email;
+
+    /**
+     * @ORM\Column(type="json")
+     */
+    private $roles = [];
+
+    /**
+     * @var string The hashed password
+     * @ORM\Column(type="string")
+     */
+    private $password;
+
+    /**
+     * @Assert\NotBlank(message="Пароль не может быть пустым")
+     * @Assert\Length(min=6, minMessage="Пароль не может быть менее {{ limit }} символов")
+     */
+    private $plainPassword;
+
+    /**
+     * @ORM\Column(type="string", nullable=true, unique=true)
+     */
+    private $apiToken;
 
     /**
      * @Assert\NotBlank(message="Имя не может быть пустым")
@@ -37,18 +58,6 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=255)
      */
     private $name;
-
-    /**
-     * @Assert\NotBlank(message="Пароль не может быть пустым")
-     * @Assert\Length(min=6, minMessage="Пароль не может быть менее {{ limit }} символов")
-     * @ORM\Column(type="string", length=255)
-     */
-    private $password;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $apiKey;
 
     /**
      * @ORM\Column(type="float")
@@ -61,17 +70,18 @@ class User implements UserInterface
      */
     private $currency;
 
-
+    /**
+     * @return null | integer
+     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
-
+    /**
+     * @param string $email
+     * @return self
+     */
     public function setEmail(string $email): self
     {
         $this->email = $email;
@@ -79,106 +89,166 @@ class User implements UserInterface
         return $this;
     }
 
-    public function getName(): ?string
+    /**
+     * @return string
+     */
+    public function getEmail(): ?string
     {
-        return $this->name;
+        return $this->email;
     }
 
-    public function setName(string $name): self
+    /**
+     * @param string $name
+     * @return self
+     */
+    public function setUsername(string $name): self
     {
         $this->name = $name;
 
         return $this;
     }
 
-    public function getPassword(): ?string
+    /**
+     * @see UserInterface
+     */
+    public function getUsername(): string
     {
-        return $this->password;
+        return (string)$this->name;
     }
 
-    public function setPassword(string $Password): self
-    {
-        $this->password = $Password;
-
-        return $this;
-    }
-
-    public function getApiKey(): ?string
-    {
-        return $this->apiKey;
-    }
-
-    public function setApiKey(string $apiKey): self
-    {
-        $this->apiKey = $apiKey;
-
-        return $this;
-    }
-
-    public function getRoles()
-    {
-        return array('ROLE_USER');
-    }
-
-    public function getBill(): ?float
-    {
-        return $this->bill;
-    }
-
-    public function setBill(?float $bill): self
+    /**
+     * @param mixed $bill
+     * @return self
+     */
+    public function setBill($bill): self
     {
         $this->bill = $bill;
 
         return $this;
     }
 
-    public function getCurrency(): ?string
+    /**
+     * @return float
+     */
+    public function getBill(): ?float
     {
-        return $this->currency;
+        return $this->bill;
     }
 
-    public function setCurrency(string $currency): self
+    /**
+     * @param mixed $currency
+     * @return self
+     */
+    public function setCurrency($currency): self
     {
         $this->currency = $currency;
 
         return $this;
     }
 
-    public function getCurrencies() {
-        return AuthController::CURRENCY;
+    /**
+     * @return string
+     */
+    public function getCurrency(): string
+    {
+        return $this->currency;
     }
 
     /**
-     * Returns the salt that was originally used to encode the password.
-     *
-     * This can return null if the password was not encoded using a salt.
-     *
-     * @return string|null The salt
+     * @return array
+     */
+    public function getCurrencies(): array
+    {
+        return AuthController::CURRENCIES;
+    }
+
+    /**
+     * @param string $plainPassword
+     * @return self
+     */
+    public function setPlainPassword(string $plainPassword): self
+    {
+        $this->plainPassword = $plainPassword;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPlainPassword(): string
+    {
+        return $this->plainPassword;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getPassword(): string
+    {
+        return (string)$this->password;
+    }
+
+    public function setPassword(string $password): self
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getApiToken(): string
+    {
+        return $this->apiToken;
+    }
+
+    /**
+     * @param mixed $apiToken
+     * @return self
+     */
+    public function setApiToken($apiToken): self
+    {
+        $this->apiToken = $apiToken;
+
+        return $this;
+    }
+
+    /**
+     * @see UserInterface
      */
     public function getSalt()
     {
-        return 'app';
+        // not needed when using the "bcrypt" algorithm in security.yaml
     }
 
     /**
-     * Returns the username used to authenticate the user.
-     *
-     * @return string The username
-     */
-    public function getUsername()
-    {
-        return $this->name;
-    }
-
-    /**
-     * Removes sensitive data from the user.
-     *
-     * This is important if, at any given point, sensitive information like
-     * the plain-text password is stored on this object.
+     * @see UserInterface
      */
     public function eraseCredentials()
     {
-        // TODO: Implement eraseCredentials() method.
+        // If you store any temporary, sensitive data on the user, clear it here
+        $this->plainPassword = null;
     }
 
 }

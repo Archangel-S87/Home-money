@@ -33,7 +33,7 @@
         <span class="form-help-text" *ngIf="form.get('password').invalid && form.get('password').touched">
             <span *ngIf="form.get('password')['errors']['required']">Пароль не может быть пустым.</span>
             <span *ngIf="form.get('password')['errors']['minlength'] && form.get('password')['errors']['minlength']['requiredLength']">
-                Пароль должен быть более {{form.get('password')['errors']['minlength']['requiredLength']}} символов. Сейчас {{form.get('password')['errors']['minlength']['actualLength']}}.
+                Пароль должен быть менее {{form.get('password')['errors']['minlength']['requiredLength']}} символов. Сейчас {{form.get('password')['errors']['minlength']['actualLength']}}.
             </span>
         </span>
     </div>
@@ -50,7 +50,8 @@
                 formControlName="name"
         >
         <span class="form-help-text" *ngIf="form.get('name').invalid && form.get('name').touched">
-            Имя не может быть пустым.
+            <span *ngIf="form.get('name')['errors']['required']">Имя не может быть пустым.</span>
+            <span *ngIf="form.get('name')['errors']['minlength'] && form.get('name')['errors']['minlength']['requiredLength']">Имя не может быть менее {{form.get('name')['errors']['minlength']['requiredLength']}} символов.</span>
         </span>
     </div>
     <div class="form-group">

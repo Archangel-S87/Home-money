@@ -1,66 +1,118 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
 import {of} from 'rxjs/internal/observable/of';
-
-import {BaseApi} from '../../../shared/core/base-api';
 import {map} from 'rxjs/operators';
-import {Currency} from '../model/currency.model';
-import {Observable} from 'rxjs';
-import {Bill} from '../model/bill.model';
+import {forkJoin, Observable} from 'rxjs';
+
+import {SystemService} from "./system.service";
+import {CurrencyRate, CurrenciesRates, ApiResponse} from "../../../shared/types";
+import {LocalStorageService} from "../../../shared/services/localStorage.service";
+import {HttpClient} from "@angular/common/http";
+import {AuthService} from "../../../shared/services/auth.service";
+import {Currencies, UserService} from "../../../shared/services/user.service";
 
 @Injectable()
-export class BillService extends BaseApi {
+export class BillService extends SystemService {
 
-  localCurrencyName = 'currencies';
+  private localCurrencyRates = 'currencyRates'; // Локальное хранилище курсов валют
+  private abbrCurrenciesRates = ['RUB', 'USD', 'EUR']; // Валюты отображаемые в кабинете
 
-  constructor(protected http: HttpClient) {
-    super(http);
+  public localCurrencyName = 'currencies';
+
+  constructor(
+    protected http: HttpClient,
+    protected authService: AuthService,
+    protected userService: UserService
+  ) {
+    super(http, authService)
   }
 
-  getBill() {
-    return this.get('bill');
+  public getBill(): Observable<Bill> {
+    return this.get('bill/' + this.authService.user.id);
   }
 
-  updateBill(bill: Bill): Observable<Bill> {
-    return this.put('bill', bill);
+  public updateBill(bill: Bill): Observable<Bill> {
+    this.getRate('RUB').subscribe((res) => {
+      res.id
+    });
+    return this.get('bill', bill);
   }
 
-  getCurrency(abbreviation: string, isForceServerUpdate = false) {
+  /**
+   * Возвращает счёт и курсы валют одновременно
+   * @param isBill Получить счёт
+   * @param isRates Получить курсы валют
+   * @param isForceServerUpdate Принудительно загрузить курсы валют
+   */
+  public getPageData(isBill = true, isRates = true, isForceServerUpdate = false)
+    : Observable<{ [abbr: string]: CurrencyRate & BillResponse }> {
 
-    if (!isForceServerUpdate) {
-      const obj = this.getLocalCurrency(abbreviation);
-      if (obj) {
-        return obj;
+    const sources: { bill?, currencies?: Observable<Currencies>, [abbr: string]: {} } = {};
+
+    if (!LocalStorageService.get('currencies')) {
+      sources.currencies = this.userService.getCurrencies();
+    }
+
+    if (isBill) {
+      sources.bill = this.getBill();
+    }
+    if (isRates) {
+      for (let abbr of this.abbrCurrenciesRates) {
+        sources[abbr] = this.getRate(abbr, isForceServerUpdate);
       }
     }
 
-    return this
-      .get('http://www.nbrb.by/API/ExRates/Rates/' + abbreviation + '?ParamMode=2', false)
-      .pipe(map((data: {}): Currency => {
-        const cur: Currency = {
-          id: data['Cur_ID'],
-          name: data['Cur_Name'],
-          abbreviation: data['Cur_Abbreviation'],
-          scale: data['Cur_Scale'],
-          officialRate: data['Cur_OfficialRate'],
-          date: new Date(data['Date'])
-        };
-        this.setLocalCurrency(cur);
-        return cur;
-      }));
+    return forkJoin(sources).pipe(
+      map((data) => {
+        if (data['currencies']) {
+          LocalStorageService.set('currencies', data['currencies']['data']['currencies']);
+          delete data['currencies'];
+        }
+        return data;
+      })
+    );
 
   }
 
-  getLocalCurrency(abbreviation: string) {
+  /**
+   * Получает курс валюты по переданой аббревиатуре (обновляет localStorage)
+   * @param abbrRate Аббревиатура
+   * @param isForceServerUpdate Принудительно сделать запрос на удалённый сервер и обновить localStorage
+   */
+  private getRate(abbrRate, isForceServerUpdate = false): Observable<CurrencyRate> {
 
-    const localData: any = this.getLocalCurrencyData();
-
-    const currency = localData[this.localCurrencyName].find((elem: Currency) => elem.abbreviation === abbreviation);
-
-    // Проверить дату создания
-    if (!localData.date || !currency) {
-      return false;
+    if (!isForceServerUpdate) {
+      const rate = this.getLocalRate(abbrRate);
+      if (rate) return rate;
     }
+
+    return this.http
+      .get('http://www.nbrb.by/API/ExRates/Rates/' + abbrRate + '?ParamMode=2')
+      .pipe(
+        map((data) => this.setLocalRate({
+            id: data['Cur_ID'],
+            name: data['Cur_Name'],
+            abbreviation: data['Cur_Abbreviation'],
+            scale: data['Cur_Scale'],
+            officialRate: data['Cur_OfficialRate'],
+            date: new Date(data['Date'])
+          })
+        )
+      );
+
+  }
+
+  /**
+   * Возвращает курс валюты из localStorage
+   * @param abbr
+   */
+  private getLocalRate(abbr: string): Observable<CurrencyRate> | false {
+
+    let localData: LocalCurrenciesRates | false = LocalStorageService.get(this.localCurrencyRates);
+    if (!localData) localData = new LocalCurrenciesRates;
+
+    const rate: CurrencyRate = localData.rates[abbr];
+
+    if (!rate) return false;
 
     // Нужно ли обновить (прошло больше суток)
     const now = new Date().getTime();
@@ -70,36 +122,46 @@ export class BillService extends BaseApi {
       return false;
     }
 
-    return of(currency);
+    return of(rate);
 
   }
 
-  setLocalCurrency(currency: Currency): void {
+  /**
+   * Помещает курс валюты в localStorage
+   * @param rate
+   */
+  private setLocalRate(rate: CurrencyRate): CurrencyRate {
 
-    const localData: any = this.getLocalCurrencyData();
+    let localData: LocalCurrenciesRates | false = LocalStorageService.get(this.localCurrencyRates);
+    if (!localData) localData = new LocalCurrenciesRates;
 
-    if (!localData[this.localCurrencyName].find(updateElem)) {
-      localData[this.localCurrencyName].push(currency);
-    }
-
+    localData.rates[rate.abbreviation] = rate;
     localData.date = new Date();
 
-    window.localStorage.setItem(this.localCurrencyName, JSON.stringify(localData));
+    window.localStorage.setItem(this.localCurrencyRates, JSON.stringify(localData));
 
-    function updateElem(elem, index, arr) {
-      if (elem.abbreviation === currency.abbreviation) {
-        arr[index] = currency;
-        return true;
-      }
-      return false;
-    }
+    return rate;
 
-  }
-
-  getLocalCurrencyData(): {} {
-    const localData: any = window.localStorage.getItem(this.localCurrencyName);
-    return  localData && localData.length ? JSON.parse(localData) : {currencies: [], date: ''};
   }
 
 }
 
+class LocalCurrenciesRates {
+  date: Date;
+  rates: CurrenciesRates;
+
+  constructor() {
+    this.rates = {};
+  }
+
+}
+
+export class Bill {
+  bill?: number = 0;
+  currency?: string;
+  message?: string;
+}
+
+export class BillResponse extends ApiResponse {
+  data: Bill;
+}

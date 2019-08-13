@@ -1,4 +1,4 @@
-export class Currency {
+export class Currencies {
   constructor(
     public id: number,
     public abbreviation: string,

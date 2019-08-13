@@ -1,10 +1,9 @@
-import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {BillService} from '../shared/services/bill.service';
-import {forkJoin} from 'rxjs/internal/observable/forkJoin';
-import {Observable, Subscription} from 'rxjs';
-import {Bill} from '../shared/model/bill.model';
-import {Currency} from '../shared/model/currency.model';
-import { MatMenuTrigger } from '@angular/material/menu';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Subscription} from 'rxjs';
+
+import {Bill, BillService} from '../shared/services/bill.service';
+import {AuthService} from "../../shared/services/auth.service";
+import {CurrenciesRates} from "../../shared/types";
 
 @Component({
   selector: 'wfm-bill-page',
@@ -13,45 +12,44 @@ import { MatMenuTrigger } from '@angular/material/menu';
 })
 export class BillPageComponent implements OnInit, OnDestroy {
 
-  bill: Bill;
-  currenciesAbbr: string[] = ['RUB', 'USD', 'EUR'];
-  currency: Currency[];
+  private bill: Bill;
+  private currenciesRates: CurrenciesRates;
 
-  subscriptionStart: Subscription;
-  subscriptionRefresh: Subscription;
+  private subscriptionStart: Subscription;
+  private subscriptionRefresh: Subscription;
 
-  isLoaded = false;
+  private isLoaded = false;
 
-  constructor(private billService: BillService) {}
-
-  private getFork({bill: bill, currencies: currencies, isForceServerUpdate}:
-      {bill?: boolean, currencies?: string[], isForceServerUpdate?: boolean}): Observable<any> {
-    const sources = [];
-    if (bill) {
-      sources.push(this.billService.getBill());
-    }
-    if (currencies) {
-      for (const currency of currencies) {
-        sources.push(this.billService.getCurrency(currency, isForceServerUpdate));
-      }
-    }
-    return forkJoin(sources);
-  }
+  constructor(private billService: BillService, private authService: AuthService) {}
 
   ngOnInit() {
-    this.subscriptionStart = this.getFork({bill: true, currencies: this.currenciesAbbr})
-      .subscribe((data: any[]) => {
-        this.bill = data.shift();
-        this.currency = data;
-        this.isLoaded = true;
+    // TODO Убрать перед продакшеном
+    let localUser = window.localStorage.getItem('user');
+    if (!this.authService.user && localUser) {
+      this.authService.user = JSON.parse(localUser);
+    }
+
+    this.subscriptionStart = this.billService
+      .getPageData()
+      .subscribe((data) => {
+
+        if (!data.bill.errors) {
+          this.bill = data.bill.data;
+        }
+
+        delete data.bill;
+        this.currenciesRates = data;
+
+        this.isLoaded = true; // Отображаю содержимое страницы
+
       });
   }
 
   onRefresh() {
     this.isLoaded = false;
-    this.subscriptionRefresh = this.getFork({currencies: this.currenciesAbbr, isForceServerUpdate: true})
-      .subscribe((data: any[]) => {
-        this.currency = data;
+    this.subscriptionRefresh = this.billService.getPageData(false,true, true)
+      .subscribe((data) => {
+        this.currenciesRates = data;
         this.isLoaded = true;
       });
   }

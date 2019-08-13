@@ -20,4 +20,4 @@ RewriteRule ^(.*)$ public/app/$1 [L,QSA]
 # Разрешаю доступ с localhost-а
 Header add Access-Control-Allow-Origin: http://localhost:4200
 Header add Access-Control-Allow-Methods: POST,GET,OPTIONS,DELETE,PUT
-Header add Access-Control-Allow-Headers: X-Requested-With,Content-Type,Origin,Authorization,Accept,Client-Security-Token,Accept-Encoding
+Header add Access-Control-Allow-Headers: X-Requested-With,Content-Type,Origin,Authorization,Accept,Client-Security-Token,Accept-Encoding,X-AUTH-TOKEN

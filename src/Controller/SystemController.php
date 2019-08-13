@@ -2,19 +2,36 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\Annotation\Route;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use Symfony\Component\HttpFoundation\Response;
 
 class SystemController extends AbstractController
 {
+
     /**
-     * @Route("/system", name="system")
+     * @Rest\Get("/system/bill/{id}", name="getBill")
+     * @param User $user
+     * @return Response
      */
-    public function index()
+    public function getBill(User $user)
     {
+        $this->denyAccessUnlessGranted('view', $user);
+
         return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/SystemController.php',
+            'errors' => false,
+            'data' => [
+                'bill' => $user->getBill(),
+                'currency' => $user->getCurrency()
+            ]
         ]);
     }
+
+    public function isAuthor(User $user = null)
+    {
+        return $user && $user->getEmail() == '123';
+    }
+
 }

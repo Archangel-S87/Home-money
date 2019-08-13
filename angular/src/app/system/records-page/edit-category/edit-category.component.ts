@@ -4,7 +4,7 @@ import {NgForm} from '@angular/forms';
 import {Subscription} from 'rxjs';
 
 import {Category} from '../../shared/model/category.model';
-import {Message} from '../../../shared/models/message.model';
+import {Message} from "../../../shared/types";
 
 @Component({
   selector: 'wfm-edit-category',
@@ -27,7 +27,7 @@ export class EditCategoryComponent implements OnInit, OnDestroy {
   constructor(private categoriesService: CategoriesService) { }
 
   ngOnInit() {
-    this.message = new Message('success', '');
+    this.message = {type: 'success', text: ''};
     this.onCategoryChange();
   }
 

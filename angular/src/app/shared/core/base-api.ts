@@ -1,30 +1,53 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
+import {map} from "rxjs/operators";
+
+import {AuthService} from "../services/auth.service";
+import {LocalStorageService} from "../services/localStorage.service";
+import {ApiResponse} from "../types";
 
 @Injectable()
 export class BaseApi {
 
-  protected baseUrl = '/api/';
+  protected url = '/api/';
 
-  constructor(protected http: HttpClient) {
+  constructor(protected http: HttpClient, protected authService: AuthService) {
+    // Для запуска api на локальном сервре
     if (window.location.host.indexOf('localhost') !== -1) {
-      this.baseUrl = '//home-money.loc' + this.baseUrl;
+      this.url = 'http://home-money.loc' + this.url;
     }
   }
 
-  public get(url: string = '', data: {} = {}, isBaseUrl: boolean = true): Observable<any> {
-    url = isBaseUrl ? this.baseUrl + url : url;
-    url += BaseApi.transformData(data);
+  protected get(url = '', data = {}): Observable<any> {
+
+    url = this.getUrl(url);
+    url += this.transformData(data);
+
     return this.http.get(url);
+
   }
 
-  static transformData(data: {}) {
+  private getUrl(url: string): string {
+    url = this.url + url;
+    // Убираю двойные слеши из url
+    url = url.replace(/(^|[^:])[/]{2,}/g, '$1/');
+    // Убираю последний слеш с конца
+    url = url.replace(/[/]$/, '');
+    return url;
+  }
+
+  private transformData(data: {}) {
+
+    // Если пользователь авторизован добавляю token
+    if (this.authService.user) {
+      data['token'] = this.authService.user.token;
+    }
 
     if (!Object.keys(data).length) return '';
 
     let str = '?',
-        count = 0;
+      count = 0;
 
     for (let key in data) {
       if (!data[key]) continue;
@@ -34,18 +57,6 @@ export class BaseApi {
 
     return str;
 
-  }
-
-  public post(url: string = '', data: any = {}): Observable<any> {
-    return this.http.post(this.getUrl(url), data);
-  }
-
-  public put(url: string = '', data: any = {}): Observable<any> {
-    return this.http.put(this.getUrl(url), data);
-  }
-
-  private getUrl(url: string = ''): string {
-    return this.baseUrl + url;
   }
 
 }
