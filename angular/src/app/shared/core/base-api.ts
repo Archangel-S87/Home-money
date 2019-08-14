@@ -1,11 +1,8 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {map} from "rxjs/operators";
 
 import {AuthService} from "../services/auth.service";
-import {LocalStorageService} from "../services/localStorage.service";
-import {ApiResponse} from "../types";
 
 @Injectable()
 export class BaseApi {

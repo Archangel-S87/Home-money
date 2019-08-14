@@ -37,6 +37,7 @@ class EventsRepository extends ServiceEntityRepository
             ->setParameter('author', $user->getId())
             ->setParameter('now', $now)
             ->setParameter('month', $month)
+            ->orderBy('e.date', 'desc')
             ->getQuery()
             ->getResult();
     }

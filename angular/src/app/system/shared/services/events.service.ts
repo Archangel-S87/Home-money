@@ -15,12 +15,16 @@ export class EventsService extends SystemService {
     return this.get('events');
   }
 
+  getEventById(id: string | number): Observable<AppEventResponse> {
+    return this.get('event/' + id);
+  }
+
 }
 
-class AppEventResponse extends ApiResponse{
+export class AppEventResponse extends ApiResponse {
   data: AppEvent;
 }
 
-class AppEventsResponse extends ApiResponse{
+export class AppEventsResponse extends ApiResponse {
   data: AppEvent[];
 }

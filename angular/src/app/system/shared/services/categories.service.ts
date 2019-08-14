@@ -12,6 +12,10 @@ export class CategoriesService extends SystemService {
     return this.get('category/add', category);
   }
 
+  getCategoryById(id: string | number): Observable<CategoryResponse> {
+    return this.get('category/' + id);
+  }
+
   getCategories(): Observable<CategoriesResponse> {
     return this.get('categories');
   }
@@ -22,10 +26,10 @@ export class CategoriesService extends SystemService {
 
 }
 
-class CategoryResponse extends ApiResponse {
+export class CategoryResponse extends ApiResponse {
   data: Category
 }
 
-class CategoriesResponse extends ApiResponse {
+export class CategoriesResponse extends ApiResponse {
   data: Category[]
 }

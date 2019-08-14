@@ -8,19 +8,25 @@
                     </div>
                     <div class="form-inline pull-right m-r-2">
                         <div class="form-group">
-                            <label for=""></label>
-                            <input type="email" class="form-control" placeholder="Поиск...">
+                            <label for="find"></label>
+                            <input
+                                    id="find"
+                                    type="text"
+                                    class="form-control"
+                                    [placeholder]="nameMap[searchField]"
+                                    [(ngModel)]="searchValue"
+                            >
                         </div>
-                        <div class="btn-group">
+                        <div class="btn-group" wfmDropdown>
                             <button type="button" class="btn btn-secondary dropdown-toggle ">
                                 Параметр
                             </button>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item" href="#">Action</a>
-                                <a class="dropdown-item" href="#">Another action</a>
-                                <a class="dropdown-item" href="#">Something else here</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="#">Separated link</a>
+                                <a
+                                        class="dropdown-item"
+                                        *ngFor="let name of nameMap | keyvalue"
+                                        (click)="searchField = name.key"
+                                >{{name.value}}</a>
                             </div>
                         </div>
                     </div>
@@ -38,28 +44,16 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <th scope="row">1</th>
-                            <td>44 444</td>
-                            <td>12.12.2017</td>
-                            <td>Товары</td>
+                        <tr *ngFor="let e of events | wfmFilterEvents:searchValue:searchField:categories; let idx = index">
+                            <th scope="row">{{idx + 1}}</th>
+                            <td>{{e.amount | number:'1.2'}}</td>
+                            <td>{{e.date}}</td>
+                            <td>{{getEventCatName(e)}}</td>
                             <td>
-                                <span class="label label-danger">Расход</span>
+                                <span class="label" [ngClass]="getEventClass(e)">{{e.type === 'income' ? 'Доход' : 'Расход'}}</span>
                             </td>
                             <td class="text-lg-center">
-                                <a href="#" class="btn btn-primary-outline">Открыть</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">2</th>
-                            <td>33 333</td>
-                            <td>12.12.2017</td>
-                            <td>Отдых</td>
-                            <td>
-                                <span class="label label-success">Доход</span>
-                            </td>
-                            <td class="text-lg-center">
-                                <a href="#" class="btn btn-primary-outline">Открыть</a>
+                                <a [routerLink]="['/system/history', e.id]" class="btn btn-primary-outline">Открыть</a>
                             </td>
                         </tr>
                         </tbody>

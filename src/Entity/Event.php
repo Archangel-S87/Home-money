@@ -45,7 +45,7 @@ class Event
     /**
      * @Assert\NotBlank(message="Должен быть дата")
      * @Assert\Type(type="DateTime", message="Неверный тип даты")
-     * @ORM\Column(type="date")
+     * @ORM\Column(type="datetime")
      */
     private $date;
 

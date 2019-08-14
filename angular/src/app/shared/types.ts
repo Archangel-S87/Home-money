@@ -65,7 +65,7 @@ export class Category {
  */
 export class AppEvent {
   id?: number;
-  type: string;
+  type: 'income' | 'outcome';
   amount: number;
   category: number;
   date: string;

@@ -12,7 +12,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\Constraints\DateTime;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class SystemController extends AbstractController
@@ -46,7 +45,7 @@ class SystemController extends AbstractController
 
     /**
      * TODO Убрать id из запроса
-     * @Rest\Get("/system/bill/{id}", name="getBill")
+     * @Rest\Get("/system/bill/{id}", name="getBill", requirements={"id"="\d+"})
      * @param User $user
      * @return Response
      */
@@ -87,7 +86,29 @@ class SystemController extends AbstractController
     }
 
     /**
-     * @Rest\Get("/system/category/edit/{id}", name="editCategory")
+     * @Rest\Get("/system/category/{id}", name="getCategoryById", requirements={"id"="\d+"})
+     * @param Category $category
+     * @return Response
+     */
+    public function getCategoryById(Category $category)
+    {
+        $user = $this->getUser();
+        $this->denyAccessUnlessGranted('view', $user);
+
+        $data = [];
+        if ($category) {
+            $data = [
+                'id' => $category->getId(),
+                'name' => $category->getName(),
+                'capacity' => $category->getCapacity()
+            ];
+        }
+
+        return $this->json(Shared::response($data));
+    }
+
+    /**
+     * @Rest\Get("/system/category/edit/{id}", name="editCategory", requirements={"id"="\d+"})
      * @param Category $category
      * @param Request $request
      * @param ValidatorInterface $validator
@@ -176,7 +197,7 @@ class SystemController extends AbstractController
                     'type' => $event->getType(),
                     'amount' => $event->getAmount(),
                     'category' => $event->getCategory(),
-                    'date' => $event->getDate()->format('d.m.Y'),
+                    'date' => $event->getDate()->format('d.m.Y H:i:s'),
                     'description' => $event->getDescription()
                 ];
             }
@@ -217,6 +238,31 @@ class SystemController extends AbstractController
         $em->flush();
 
         return $this->json(Shared::response());
+    }
+
+    /**
+     * @Rest\Get("/system/event/{id}", name="getEventById", requirements={"id"="\d+"})
+     * @param Event $event
+     * @return Response
+     */
+    public function getEventById(Event $event)
+    {
+        $user = $this->getUser();
+        $this->denyAccessUnlessGranted('view', $user);
+
+        $data = [];
+        if ($event) {
+            $data = [
+                'id' => $event->getId(),
+                'type' => $event->getType(),
+                'amount' => $event->getAmount(),
+                'category' => $event->getCategory(),
+                'date' => $event->getDate()->format('d.m.Y H:i:s'),
+                'description' => $event->getDescription()
+            ];
+        }
+
+        return $this->json(Shared::response($data));
     }
 
 }

@@ -47,7 +47,7 @@ export class AddEventComponent implements OnInit, OnDestroy {
       type: form.value.type,
       amount: + form.value.amount,
       category: + form.value.category,
-      date: moment().format('DD.MM.YYYY'),
+      date: moment().format('DD.MM.YYYY HH:mm:ss'),
       description: form.value.description
     };
     if (event.amount < 0) {
