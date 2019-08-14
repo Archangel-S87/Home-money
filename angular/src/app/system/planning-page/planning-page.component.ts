@@ -1,12 +1,10 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
+import {forkJoin, Subscription} from 'rxjs';
 
-import {BillService} from '../shared/services/bill.service';
+import {Bill, BillService} from '../shared/services/bill.service';
 import {CategoriesService} from '../shared/services/categories.service';
 import {EventsService} from '../shared/services/events.service';
-import {forkJoin, Subscription} from 'rxjs';
-import {Bill} from '../shared/model/bill.model';
-import {WfmEvent} from '../shared/model/event.model';
-import {Category} from "../../shared/types";
+import {AppEvent, Category} from "../../shared/types";
 
 @Component({
   selector: 'wfm-planning-page',
@@ -19,7 +17,7 @@ export class PlanningPageComponent implements OnInit, OnDestroy {
 
   bill: Bill;
   categories: Category[] = [];
-  events: WfmEvent[] = [];
+  events: AppEvent[] = [];
 
   subscription: Subscription;
 
@@ -30,14 +28,14 @@ export class PlanningPageComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
-    this.subscription = forkJoin([
-      this.billService.getBill(),
-      this.categoriesService.getCategories(),
-      this.eventsService.getEvents()
-    ]).subscribe((data: [Bill, Category[], WfmEvent[]]) => {
-      this.bill = data[0];
-      this.categories = data[1];
-      this.events = data[2];
+    this.subscription = forkJoin({
+        bill: this.billService.getBill(),
+        categories: this.categoriesService.getCategories(),
+        events: this.eventsService.getEvents()
+    }).subscribe((data) => {
+      this.bill = data.bill.data;
+      this.categories = data.categories.data;
+      this.events = data.events.data;
       this.isLoaded = true;
     });
   }
@@ -64,7 +62,9 @@ export class PlanningPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 
 }

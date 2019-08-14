@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Event;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -17,6 +18,27 @@ class EventsRepository extends ServiceEntityRepository
     public function __construct(RegistryInterface $registry)
     {
         parent::__construct($registry, Event::class);
+    }
+
+    /**
+     * @param User $user
+     * @return Event[]
+     * @throws \Exception
+     */
+    public function findEventsCurrentMonth(User $user)
+    {
+        $now = new \DateTime('now');
+        $month = new \Datetime('first day of this month');
+
+        return $this->createQueryBuilder('e')
+            ->where('e.author = :author')
+            ->andWhere('e.date <= :now')
+            ->andWhere('e.date >= :month')
+            ->setParameter('author', $user->getId())
+            ->setParameter('now', $now)
+            ->setParameter('month', $month)
+            ->getQuery()
+            ->getResult();
     }
 
     // /**

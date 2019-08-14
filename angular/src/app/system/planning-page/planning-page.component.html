@@ -1,6 +1,6 @@
 <div class="title-block">
     <h3 class="title">
-        Страница планирования <span class="sparkline bar"></span>
+        Планирование <span class="sparkline bar"></span>
     </h3>
 </div>
 
@@ -14,7 +14,7 @@
                         <h3 class="title">Расходы</h3>
                     </div>
                     <h5 class="planning-expenses pull-right">
-                        Общий остаток: <span class="text-success">{{bill.value | currency: 'BYN '}}</span>
+                        Общий остаток: <span class="text-success">{{bill.bill | currency: bill.currency + ' '}}</span>
                     </h5>
                 </div>
                 <div class="card-block">
@@ -30,7 +30,7 @@
                             <p>
                                 <span class="text-{{getCategoryColorClass(cat)}}">{{getCategoryCost(cat) | currency: ' '}}</span>
                                 из
-                                <span class="text-primary">{{cat.capacity | currency: ' '}}</span>
+                                <span class="text-primary">{{cat.capacity ? cat.capacity : 0 | currency: ' '}}</span>
                                 |
                                 осталось <span class="text-{{getCategoryColorClass(cat)}}">{{cat.capacity - getCategoryCost(cat) | currency: ' '}}</span> (руб.)
                             </p>

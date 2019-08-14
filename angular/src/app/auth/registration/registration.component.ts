@@ -47,8 +47,7 @@ export class RegistrationComponent implements OnInit {
     this.userService
       .createNewUser(user)
       .subscribe((response) => {
-        if (response) {
-          // Есть ошибки
+        if (response.errors) {
           this.setErrors(response);
         } else {
           return this.router.navigate(['/login'], {

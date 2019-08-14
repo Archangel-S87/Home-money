@@ -6,6 +6,7 @@ use App\Entity\Category;
 use App\Entity\Event;
 use App\Entity\User;
 use App\Repository\CategoriesRepository;
+use App\Repository\EventsRepository;
 use App\Services\Shared;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -70,14 +71,16 @@ class SystemController extends AbstractController
         $this->denyAccessUnlessGranted('view', $user);
 
         $categories = $repository->findBy(['author' => $user->getId()]);
-
         $data = [];
-        foreach ($categories as $category) {
-            $data[] = [
-                'id' => $category->getId(),
-                'name' => $category->getName(),
-                'capacity' => $category->getCapacity()
-            ];
+
+        if ($categories) {
+            foreach ($categories as $category) {
+                $data[] = [
+                    'id' => $category->getId(),
+                    'name' => $category->getName(),
+                    'capacity' => $category->getCapacity()
+                ];
+            }
         }
 
         return $this->json(Shared::response($data));
@@ -150,6 +153,36 @@ class SystemController extends AbstractController
             'name' => $category->getName(),
             'capacity' => $category->getCapacity(),
         ]));
+    }
+
+    /**
+     * @Rest\Get("/system/events", name="getEvents")
+     * @param EventsRepository $repository
+     * @return Response
+     * @throws \Exception
+     */
+    public function getEvents(EventsRepository $repository)
+    {
+        $user = $this->getUser();
+        $this->denyAccessUnlessGranted('view', $user);
+
+        $events = $repository->findEventsCurrentMonth($user);
+        $data = [];
+
+        if ($events) {
+            foreach ($events as $event) {
+                $data[] = [
+                    'id' => $event->getId(),
+                    'type' => $event->getType(),
+                    'amount' => $event->getAmount(),
+                    'category' => $event->getCategory(),
+                    'date' => $event->getDate()->format('d.m.Y'),
+                    'description' => $event->getDescription()
+                ];
+            }
+        }
+
+        return $this->json(Shared::response($data));
     }
 
     /**
