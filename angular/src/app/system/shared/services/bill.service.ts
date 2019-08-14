@@ -26,15 +26,12 @@ export class BillService extends SystemService {
     super(http, authService)
   }
 
-  public getBill(): Observable<Bill> {
+  public getBill(): Observable<BillResponse> {
     return this.get('bill/' + this.authService.user.id);
   }
 
   public updateBill(bill: Bill): Observable<Bill> {
-    this.getRate('RUB').subscribe((res) => {
-
-    });
-    return this.get('bill', bill);
+    return this.get('bill/edit', bill);
   }
 
   /**

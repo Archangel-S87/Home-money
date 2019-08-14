@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Category;
+use App\Entity\Event;
 use App\Entity\User;
 use App\Repository\CategoriesRepository;
 use App\Services\Shared;
@@ -10,10 +11,37 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Constraints\DateTime;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class SystemController extends AbstractController
 {
+
+    /**
+     * @Rest\Get("/system/bill/edit", name="editBill")
+     * @param Request $request
+     * @param ValidatorInterface $validator
+     * @return Response
+     */
+    public function editBill(Request $request, ValidatorInterface $validator)
+    {
+        $user = $this->getUser();
+        $this->denyAccessUnlessGranted('view', $user);
+
+        $user->setBill($request->get('bill'));
+
+        $errors = $validator->validateProperty($user, 'bill');
+
+        if (count($errors) > 0) {
+            return $this->json(Shared::errorsHandler($errors));
+        }
+
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($user);
+        $em->flush();
+
+        return $this->json(Shared::response());
+    }
 
     /**
      * TODO Убрать id из запроса
@@ -39,7 +67,6 @@ class SystemController extends AbstractController
     public function getCategories(CategoriesRepository $repository)
     {
         $user = $this->getUser();
-
         $this->denyAccessUnlessGranted('view', $user);
 
         $categories = $repository->findBy(['author' => $user->getId()]);
@@ -125,6 +152,38 @@ class SystemController extends AbstractController
         ]));
     }
 
+    /**
+     * @Rest\Get("/system/event/add", name="addEvent")
+     * @param Request $request
+     * @param ValidatorInterface $validator
+     * @return Response
+     * @throws \Exception
+     */
+    public function addEvent(Request $request, ValidatorInterface $validator)
+    {
+        $user = $this->getUser();
+        $this->denyAccessUnlessGranted('view', $user);
 
+        $event = new Event();
+        $event
+            ->setAmount($request->get('amount'))
+            ->setType($request->get('type'))
+            ->setCategory($request->get('category'))
+            ->setDate($request->get('date'))
+            ->setDescription($request->get('description'))
+            ->setAuthor($user->getId());
+
+        $errors = $validator->validate($event);
+
+        if (count($errors) > 0) {
+            return $this->json(Shared::errorsHandler($errors));
+        }
+
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($event);
+        $em->flush();
+
+        return $this->json(Shared::response());
+    }
 
 }

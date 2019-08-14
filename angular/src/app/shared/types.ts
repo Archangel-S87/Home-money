@@ -59,3 +59,16 @@ export class Category {
   capacity: number;
   author?: number;
 }
+
+/**
+ * Событие
+ */
+export class AppEvent {
+  id?: number;
+  type: string;
+  amount: number;
+  category: number;
+  date: string;
+  description: string;
+  author?: number;
+}

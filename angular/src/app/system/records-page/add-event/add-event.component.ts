@@ -4,11 +4,9 @@ import * as moment from 'moment';
 import {mergeMap} from 'rxjs/operators';
 import {Subscription} from 'rxjs';
 
-import {WfmEvent} from '../../shared/model/event.model';
 import {EventsService} from '../../shared/services/events.service';
-import {BillService} from '../../shared/services/bill.service';
-import {Bill} from '../../shared/model/bill.model';
-import {Category, Message} from "../../../shared/types";
+import {Bill, BillService} from '../../shared/services/bill.service';
+import {AppEvent, Category, Message} from "../../../shared/types";
 
 @Component({
   selector: 'wfm-add-event',
@@ -16,6 +14,8 @@ import {Category, Message} from "../../../shared/types";
   styleUrls: ['./add-event.component.scss']
 })
 export class AddEventComponent implements OnInit, OnDestroy {
+
+  private bill: Bill;
 
   currentCategoryId = 1;
   types = [
@@ -33,20 +33,21 @@ export class AddEventComponent implements OnInit, OnDestroy {
   constructor(private eventsService: EventsService, private billService: BillService) {}
 
   ngOnInit() {
-    this.message = {type: 'danger', text: ''};
+    this.message = {type: '', text: ''};
   }
 
-  private showMessage(text: string) {
+  private showMessage(text: string, type: string = 'danger') {
     this.message.text = text;
+    this.message.type = type;
     setTimeout(() => this.message.text = '', 5000);
   }
 
   onSubmit(form: NgForm) {
-    const event: WfmEvent = {
+    const event: AppEvent = {
       type: form.value.type,
       amount: + form.value.amount,
       category: + form.value.category,
-      date: moment().format('DD.MM.YYYY HH:mm:ss'),
+      date: moment().format('DD.MM.YYYY'),
       description: form.value.description
     };
     if (event.amount < 0) {
@@ -54,28 +55,39 @@ export class AddEventComponent implements OnInit, OnDestroy {
     }
 
     this.subscriptionGetBill = this.billService.getBill()
-      .subscribe((bill: Bill) => {
+      .subscribe((response) => {
 
-        if (event.type === 'outcome') {
-          if (event.amount > bill.bill) {
-            this.showMessage('На счету недостаточно средств. Вам не хватает ' + (event.amount - bill.bill));
-            return;
-          } else {
-            bill.bill -= event.amount;
-          }
-        } else {
-          bill.bill += event.amount;
+        if (!response.errors) {
+          this.bill = response.data;
         }
 
-        this.subscriptionUpdateBill = this.billService.updateBill(bill)
-          .pipe(mergeMap(() => this.eventsService.addEvent(event)))
+        if (event.type === 'outcome') {
+          if (event.amount > this.bill.bill) {
+            this.showMessage('На счету недостаточно средств. Вам не хватает ' + (event.amount - this.bill.bill));
+            return;
+          } else {
+            this.bill.bill -= event.amount;
+          }
+        } else {
+          this.bill.bill += event.amount;
+        }
+
+        this.subscriptionUpdateBill = this.billService.updateBill(this.bill)
+          .pipe(
+            mergeMap(() => this.eventsService.addEvent(event))
+          )
           .subscribe(() => {
+            if (response.errors) {
+              this.eventsService.setErrors(response.data, form);
+              return false;
+            }
             form.reset({
               type: event.type,
               amount: 0,
               category: event.category,
               description: ''
             });
+            this.showMessage('Событие добавлено', 'success');
           });
 
       });

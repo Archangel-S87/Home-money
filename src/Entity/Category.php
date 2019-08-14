@@ -35,8 +35,9 @@ class Category
     private $capacity;
 
     /**
-     * @Assert\NotBlank(message="Должен быть автор")
      * Кто создал категорию
+     * @Assert\NotBlank(message="Должен быть автор")
+     * @Assert\Type(type="integer", message="Автор - id")
      * @ORM\Column(type="integer")
      */
     private $author;
