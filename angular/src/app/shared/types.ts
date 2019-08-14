@@ -49,3 +49,13 @@ export class CurrenciesRates {
     this[data.abbreviation] = data;
   }
 }
+
+/**
+ * Категория слбытия
+ */
+export class Category {
+  id?: number;
+  name: string;
+  capacity: number;
+  author?: number;
+}

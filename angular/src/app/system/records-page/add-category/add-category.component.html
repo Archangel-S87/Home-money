@@ -22,7 +22,7 @@
                 <span
                         class="form-help-text"
                         *ngIf="name.invalid && name.touched"
-                >Название категории не может быть пустым</span>
+                >Название категории дожно быть уникальным и не может быть пустым</span>
             </div>
             <div
                     class="form-group"
@@ -37,7 +37,6 @@
                         name="capacity"
                         #capacity='ngModel'
                         required
-                        min="1"
                 >
                 <span
                         class="form-help-text"

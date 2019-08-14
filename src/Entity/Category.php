@@ -3,10 +3,13 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\CategoriesRepository")
  * @ORM\Table(name="categories")
+ * @UniqueEntity(fields={"name", "author"}, message="Не уникальный название", payload="forbiddenName")
  */
 class Category
 {
@@ -18,14 +21,25 @@ class Category
     private $id;
 
     /**
+     * @Assert\NotBlank(message="Название не может быть пустым")
+     * @Assert\Length(min=2, minMessage="Название не может быть менее {{ limit }} символов")
      * @ORM\Column(type="string", length=255)
      */
     private $name;
 
     /**
+     * Ограничение расходов за периуд
+     * @Assert\Type(type="integer", message="Лимит должен быть числом")
      * @ORM\Column(type="integer", nullable=true)
      */
     private $capacity;
+
+    /**
+     * @Assert\NotBlank(message="Должен быть автор")
+     * Кто создал категорию
+     * @ORM\Column(type="integer")
+     */
+    private $author;
 
 
     public function getId(): ?int
@@ -53,6 +67,18 @@ class Category
     public function setCapacity(?int $capacity): self
     {
         $this->capacity = $capacity;
+
+        return $this;
+    }
+
+    public function getAuthor(): ?int
+    {
+        return $this->author;
+    }
+
+    public function setAuthor(int $author): self
+    {
+        $this->author = $author;
 
         return $this;
     }

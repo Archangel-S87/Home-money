@@ -3,8 +3,7 @@ import {CategoriesService} from '../../shared/services/categories.service';
 import {NgForm} from '@angular/forms';
 import {Subscription} from 'rxjs';
 
-import {Category} from '../../shared/model/category.model';
-import {Message} from "../../../shared/types";
+import {Category, Message} from "../../../shared/types";
 
 @Component({
   selector: 'wfm-edit-category',
@@ -29,6 +28,7 @@ export class EditCategoryComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.message = {type: 'success', text: ''};
     this.onCategoryChange();
+    this.currentCategory = new Category();
   }
 
   onCategoryChange() {
@@ -45,8 +45,12 @@ export class EditCategoryComponent implements OnInit, OnDestroy {
       category.capacity *= -1;
     }
     this.subscription = this.categoriesService.updateCategory(category)
-      .subscribe((editCategory: Category) => {
-        this.wfmNnCategoryEdit.emit(editCategory);
+      .subscribe((response) => {
+        if (response.errors) {
+          this.categoriesService.setErrors(response.data, form);
+          return false;
+        }
+        this.wfmNnCategoryEdit.emit(response.data);
         this.message.text = 'Категория сохранена';
         setTimeout(() => this.message.text = '', 5000);
       });

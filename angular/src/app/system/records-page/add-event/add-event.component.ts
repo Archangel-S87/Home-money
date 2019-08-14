@@ -5,11 +5,10 @@ import {mergeMap} from 'rxjs/operators';
 import {Subscription} from 'rxjs';
 
 import {WfmEvent} from '../../shared/model/event.model';
-import {Category} from '../../shared/model/category.model';
 import {EventsService} from '../../shared/services/events.service';
 import {BillService} from '../../shared/services/bill.service';
 import {Bill} from '../../shared/model/bill.model';
-import {Message} from '../../../shared/models/message.model';
+import {Category, Message} from "../../../shared/types";
 
 @Component({
   selector: 'wfm-add-event',
@@ -34,7 +33,7 @@ export class AddEventComponent implements OnInit, OnDestroy {
   constructor(private eventsService: EventsService, private billService: BillService) {}
 
   ngOnInit() {
-    this.message = new Message('danger', '');
+    this.message = {type: 'danger', text: ''};
   }
 
   private showMessage(text: string) {
@@ -58,14 +57,14 @@ export class AddEventComponent implements OnInit, OnDestroy {
       .subscribe((bill: Bill) => {
 
         if (event.type === 'outcome') {
-          if (event.amount > bill.value) {
-            this.showMessage('На счету недостаточно средств. Вам не хватает ' + (event.amount - bill.value));
+          if (event.amount > bill.bill) {
+            this.showMessage('На счету недостаточно средств. Вам не хватает ' + (event.amount - bill.bill));
             return;
           } else {
-            bill.value -= event.amount;
+            bill.bill -= event.amount;
           }
         } else {
-          bill.value += event.amount;
+          bill.bill += event.amount;
         }
 
         this.subscriptionUpdateBill = this.billService.updateBill(bill)

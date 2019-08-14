@@ -3,7 +3,7 @@ import {NgForm} from '@angular/forms';
 import {Subscription} from 'rxjs';
 
 import {CategoriesService} from '../../shared/services/categories.service';
-import {Category} from '../../shared/model/category.model';
+import {Category} from "../../../shared/types";
 
 @Component({
   selector: 'wfm-add-category',
@@ -12,7 +12,7 @@ import {Category} from '../../shared/model/category.model';
 })
 export class AddCategoryComponent implements OnDestroy {
 
-  capacityDefault = 1;
+  capacityDefault = 0;
 
   subscription: Subscription;
 
@@ -29,9 +29,13 @@ export class AddCategoryComponent implements OnDestroy {
       category.capacity *= -1;
     }
     this.subscription = this.categoriesService.addCategory(category)
-      .subscribe((newCategory: Category) => {
+      .subscribe((response) => {
+        if (response.errors) {
+          this.categoriesService.setErrors(response.data, form);
+          return false;
+        }
         form.reset({capacity: this.capacityDefault});
-        this.wfmNnCategoryAdd.emit(newCategory);
+        this.wfmNnCategoryAdd.emit(response.data);
     });
   }
 

@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Services\Shared;
 use Doctrine\ORM\Mapping\Entity;
 use JMS\Serializer\Serializer;
 use JMS\Serializer\SerializerInterface;
@@ -72,7 +73,7 @@ class AuthController extends AbstractController
         $email = $request->get('email');
         $pass = $request->get('password');
 
-        if (!$email || !$pass) return $this->json($this->response);
+        if (!$email || !$pass) return $this->json(Shared::errorsHandler());
 
         $user = $this->userRepository->findOneBy(['email' => $email]);
 
@@ -94,8 +95,7 @@ class AuthController extends AbstractController
         $em->persist($user);
         $em->flush();
 
-        $this->response['errors'] = false;
-        $this->response['data'] = [
+        return $this->json(Shared::response([
             'user' => [
                 'id' => $user->getId(),
                 'email' => $user->getBill(),
@@ -104,9 +104,7 @@ class AuthController extends AbstractController
                 'bill' => $user->getBill(),
                 'currency' => $user->getCurrency()
             ]
-        ];
-
-        return $this->json($this->response);
+        ]));
 
     }
 
@@ -117,14 +115,11 @@ class AuthController extends AbstractController
      */
     public function isEmail(Request $request)
     {
-
         $email = $request->get('email');
 
-        $this->response['errors'] = false;
-        $this->response['data']['is_email'] = !!$this->userRepository->findOneBy(['email' => $email]);
-
-        return $this->json($this->response);
-
+        return $this->json(Shared::response([
+            'is_email' => !!$this->userRepository->findOneBy(['email' => $email])
+        ]));
     }
 
     /**
@@ -134,7 +129,6 @@ class AuthController extends AbstractController
      */
     public function registration(Request $request)
     {
-
         $user = new User();
         $user
             ->setEmail($request->get('email'))
@@ -145,23 +139,7 @@ class AuthController extends AbstractController
         $errors = $this->validator->validate($user);
 
         if (count($errors) > 0) {
-            // Вот так можно запилить по накуе и проще
-            //$rep = $this->serializer->serialize($errors, 'json');
-            //return JsonResponse::fromJsonString($rep, 404);
-            $properties = [];
-            foreach ($errors as $error) {
-                $property = $error->getPropertyPath();
-                $constraint = $error->getConstraint();
-
-                if ($constraint->payload) {
-                    $properties[$property]['messages'][$constraint->payload] = $error->getMessage();
-                } else {
-                    $properties[$property]['messages'][] = $error->getMessage();
-                }
-            }
-
-            $this->response['data'] = $properties;
-            return $this->json($this->response);
+            return $this->json(Shared::errorsHandler($errors));
         }
 
         $password = $this->passwordEncoder->encodePassword($user, $user->getPlainPassword());
@@ -174,10 +152,7 @@ class AuthController extends AbstractController
         $em->persist($user);
         $em->flush();
 
-        $this->response['errors'] = false;
-
-        return $this->json($this->response);
-
+        return $this->json(Shared::response());
     }
 
     /**
@@ -185,13 +160,9 @@ class AuthController extends AbstractController
      */
     public function getCurrencies()
     {
-        $this->response = [
-            'errors' => false,
-            'data' => [
-                'currencies' => self::CURRENCIES
-            ]
-        ];
-        return $this->json($this->response);
+        return $this->json(Shared::response([
+            'currencies' => self::CURRENCIES
+        ]));
     }
 
 

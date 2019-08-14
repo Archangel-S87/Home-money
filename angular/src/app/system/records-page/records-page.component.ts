@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import {Category} from '../shared/model/category.model';
+import {Component, OnInit} from '@angular/core';
 import {CategoriesService} from '../shared/services/categories.service';
+import {Category} from "../../shared/types";
 
 @Component({
   selector: 'wfm-records-page',
@@ -12,12 +12,13 @@ export class RecordsPageComponent implements OnInit {
   isLoaded = false;
   categories: Category[] = [];
 
-  constructor(private categoriesService: CategoriesService) { }
+  constructor(private categoriesService: CategoriesService) {}
 
   ngOnInit() {
     this.categoriesService.getCategories()
-      .subscribe((categories: Category[]) => {
-        this.categories = categories;
+      .subscribe((categories) => {
+        if (categories.errors) return false;
+        this.categories = categories.data;
         this.isLoaded = true;
       });
   }

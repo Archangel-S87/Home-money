@@ -32,7 +32,7 @@ export class BillService extends SystemService {
 
   public updateBill(bill: Bill): Observable<Bill> {
     this.getRate('RUB').subscribe((res) => {
-      res.id
+
     });
     return this.get('bill', bill);
   }

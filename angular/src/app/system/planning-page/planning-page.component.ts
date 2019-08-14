@@ -5,8 +5,8 @@ import {CategoriesService} from '../shared/services/categories.service';
 import {EventsService} from '../shared/services/events.service';
 import {forkJoin, Subscription} from 'rxjs';
 import {Bill} from '../shared/model/bill.model';
-import {Category} from '../shared/model/category.model';
 import {WfmEvent} from '../shared/model/event.model';
+import {Category} from "../../shared/types";
 
 @Component({
   selector: 'wfm-planning-page',

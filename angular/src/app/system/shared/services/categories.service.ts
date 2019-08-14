@@ -1,27 +1,31 @@
-import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-
-import {BaseApi} from '../../../shared/core/base-api';
-import {Category} from '../model/category.model';
 import {Observable} from 'rxjs';
 
+import {SystemService} from "./system.service";
+import {ApiResponse, Category} from "../../../shared/types";
+
 @Injectable()
-export class CategoriesService extends BaseApi {
+export class CategoriesService extends SystemService {
 
-  constructor(protected http: HttpClient) {
-    super(http);
+  addCategory(category: Category): Observable<CategoryResponse> {
+    category.author = this.authService.user.id;
+    return this.get('category/add', category);
   }
 
-  addCategory(category: Category): Observable<Category> {
-    return this.post('categories', category);
-  }
-
-  getCategories(): Observable<Category[]> {
+  getCategories(): Observable<CategoriesResponse> {
     return this.get('categories');
   }
 
-  updateCategory(category: Category): Observable<Category> {
-    return this.put('categories/' + category.id, category);
+  updateCategory(category: Category): Observable<CategoryResponse> {
+    return this.get('category/edit/' + category.id, category);
   }
 
+}
+
+class CategoryResponse extends ApiResponse {
+  data: Category
+}
+
+class CategoriesResponse extends ApiResponse {
+  data: Category[]
 }

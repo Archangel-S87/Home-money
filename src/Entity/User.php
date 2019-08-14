@@ -11,7 +11,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @ORM\Table(name="users")
- * @UniqueEntity(fields={"email", "apiToken"}, message="Не уникальный email", payload="forbiddenEmail")
+ * @UniqueEntity(fields="email", message="Не уникальный email", payload="forbiddenEmail")
+ * @UniqueEntity(fields="apiToken", message="Не уникальный apiToken", payload="forbiddenФpiToken")
  */
 class User implements UserInterface
 {
