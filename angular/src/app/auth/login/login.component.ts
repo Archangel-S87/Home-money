@@ -5,6 +5,7 @@ import {ActivatedRoute, Params, Router} from '@angular/router';
 import {UserService} from '../../shared/services/user.service';
 import {AuthService} from '../../shared/services/auth.service';
 import {Message, User} from "../../shared/types";
+import {LocalStorageService} from "../../shared/services/localStorage.service";
 
 @Component({
     selector: 'wfm-login',
@@ -31,6 +32,8 @@ export class LoginComponent implements OnInit {
         this.route.queryParams.subscribe((params: Params) => {
             if (params.nowCanLogin) {
                 this.showMessage({text: 'Теперь вы можете зайти в систему', type: 'success'});
+            } else if (params.accessDenied) {
+                this.showMessage({text: 'Требуется авторизация!', type: 'warning'});
             }
         });
 
@@ -65,19 +68,12 @@ export class LoginComponent implements OnInit {
                     return this.showMessage({text: response.data.message, type: 'danger'});
                 }
 
-                this.authService.user = response.data.user;
-
-                const user = {...response.data.user};
-
                 this.message.text = '';
 
-                // TODO Убрать перед продакшеном?
-                //delete user.token;
-                window.localStorage.setItem('user', JSON.stringify(this.authService.user));
-
+                LocalStorageService.set('user', this.authService.user);
+                this.authService.user = response.data.user;
                 this.authService.login();
 
-                // TODO Сделать редирект на предидущую страницу ксли есть
                 return this.router.navigate(['/system', 'bill']);
             });
 

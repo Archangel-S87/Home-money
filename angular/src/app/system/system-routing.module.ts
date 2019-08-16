@@ -1,6 +1,7 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 
+import {AuthGuard} from "../shared/services/auth.guard";
 import {SystemComponent} from './system.component';
 import {BillPageComponent} from './bill-page/bill-page.component';
 import {HistoryPageComponent} from './history-page/history-page.component';
@@ -10,7 +11,7 @@ import {HistoryDetailComponent} from "./history-page/history-detail/history-deta
 
 const routes: Routes = [
   {
-    path: '', component: SystemComponent, children: [
+    path: '', component: SystemComponent, canActivate: [AuthGuard], children: [
       {path: 'bill', component: BillPageComponent},
       {path: 'history', component: HistoryPageComponent},
       {path: 'planning', component: PlanningPageComponent},

@@ -2,7 +2,6 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Subscription} from 'rxjs';
 
 import {Bill, BillService} from '../shared/services/bill.service';
-import {AuthService} from "../../shared/services/auth.service";
 import {CurrenciesRates} from "../../shared/types";
 
 @Component({
@@ -20,15 +19,9 @@ export class BillPageComponent implements OnInit, OnDestroy {
 
   private isLoaded = false;
 
-  constructor(private billService: BillService, private authService: AuthService) {}
+  constructor(private billService: BillService) {}
 
   ngOnInit() {
-    // TODO Убрать перед продакшеном
-    let localUser = window.localStorage.getItem('user');
-    if (!this.authService.user && localUser) {
-      this.authService.user = JSON.parse(localUser);
-    }
-
     this.subscriptionStart = this.billService
       .getPageData()
       .subscribe((data) => {
