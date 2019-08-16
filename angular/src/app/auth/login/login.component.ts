@@ -70,7 +70,7 @@ export class LoginComponent implements OnInit {
 
                 this.message.text = '';
 
-                LocalStorageService.set('user', this.authService.user);
+                LocalStorageService.set('user', response.data.user);
                 this.authService.user = response.data.user;
                 this.authService.login();
 
