@@ -1,7 +1,6 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {NgxChartsModule} from "@swimlane/ngx-charts";
-import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 
 import {SharedModule} from '../shared/shared.module';
 import {SystemRoutingModule} from './system-routing.module';
@@ -32,8 +31,7 @@ import {FilterEventsPipe} from "./shared/pipes/filterEvents.pipe";
     CommonModule,
     SharedModule,
     SystemRoutingModule,
-    NgxChartsModule,
-    BrowserAnimationsModule
+    NgxChartsModule
   ],
   declarations: [
     SystemComponent,

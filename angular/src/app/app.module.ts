@@ -8,8 +8,8 @@ import {AppComponent} from './app.component';
 import {AuthModule} from './auth/auth.module';
 import {UserService} from './shared/services/user.service';
 import {AuthService} from './shared/services/auth.service';
-import {SystemModule} from './system/system.module';
 import {LocalStorageService} from "./shared/services/localStorage.service";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 
 @NgModule({
   declarations: [
@@ -19,9 +19,9 @@ import {LocalStorageService} from "./shared/services/localStorage.service";
     BrowserModule,
     HttpClientModule,
     FormsModule,
+    BrowserAnimationsModule,
     AppRoutingModule,
-    AuthModule,
-    SystemModule
+    AuthModule
   ],
   providers: [UserService, AuthService, LocalStorageService],
   bootstrap: [AppComponent],
