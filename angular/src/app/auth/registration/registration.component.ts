@@ -14,9 +14,8 @@ import {Meta, Title} from "@angular/platform-browser";
 })
 export class RegistrationComponent implements OnInit {
 
-  private form: FormGroup;
-
-  protected currencies: string[] = [];
+  form: FormGroup;
+  currencies: string[] = [];
 
   constructor(
     private userService: UserService,

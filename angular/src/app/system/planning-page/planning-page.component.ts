@@ -26,7 +26,7 @@ export class PlanningPageComponent implements OnInit, OnDestroy {
     private billService: BillService,
     private categoriesService: CategoriesService,
     private eventsService: EventsService,
-    private title: Title
+    public title: Title
   ) {
     title.setTitle('Планирование');
   }

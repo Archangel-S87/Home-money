@@ -18,19 +18,19 @@ export class HistoryPageComponent implements OnInit, OnDestroy {
 
   @ViewChild(HistoryChartComponent, {static: false}) historyChartComponent: HistoryChartComponent;
 
-  private isLoaded = false;
-  private subscribe: Subscription;
+  isLoaded = false;
+  subscribe: Subscription;
 
-  protected categories: Category[] = [];
-  protected events: AppEvent[] = [];
-  protected filteredEvents: AppEvent[] = [];
+  categories: Category[] = [];
+  events: AppEvent[] = [];
+  filteredEvents: AppEvent[] = [];
 
   isFilterVisible = false;
 
   constructor(
     private categoriesService: CategoriesService,
     private eventsService: EventsService,
-    private title: Title
+    public title: Title
   ) {
     title.setTitle('История');
   }

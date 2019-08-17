@@ -13,7 +13,7 @@ export class RecordsPageComponent implements OnInit {
   isLoaded = false;
   categories: Category[] = [];
 
-  constructor(private categoriesService: CategoriesService, private title: Title) {
+  constructor(private categoriesService: CategoriesService, public title: Title) {
     title.setTitle('Записи');
   }
 

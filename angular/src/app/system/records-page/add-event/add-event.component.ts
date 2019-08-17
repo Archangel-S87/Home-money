@@ -15,7 +15,7 @@ import {AppEvent, Category, Message} from "../../../shared/types";
 })
 export class AddEventComponent implements OnInit, OnDestroy {
 
-  private bill: Bill;
+  bill: Bill;
 
   currentCategoryId = 1;
   types = [

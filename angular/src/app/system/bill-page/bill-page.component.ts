@@ -12,15 +12,15 @@ import {Title} from "@angular/platform-browser";
 })
 export class BillPageComponent implements OnInit, OnDestroy {
 
-  private bill: Bill;
-  private currenciesRates: CurrenciesRates;
+  bill: Bill;
+  currenciesRates: CurrenciesRates;
 
-  private subscriptionStart: Subscription;
-  private subscriptionRefresh: Subscription;
+  subscriptionStart: Subscription;
+  subscriptionRefresh: Subscription;
 
-  private isLoaded = false;
+  isLoaded = false;
 
-  constructor(private billService: BillService,  private title: Title) {
+  constructor(private billService: BillService, public title: Title) {
     title.setTitle('Счёт');
   }
 

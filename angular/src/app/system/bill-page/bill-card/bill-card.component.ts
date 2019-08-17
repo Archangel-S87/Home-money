@@ -16,7 +16,7 @@ export class BillCardComponent implements OnInit {
 
   private mainScore = 'BYN';
 
-  protected bills: { name: string, val: number, active: boolean }[] = [];
+  bills: { name: string, val: number, active: boolean }[] = [];
 
   ngOnInit() {
 
