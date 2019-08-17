@@ -3,6 +3,7 @@ import {Subscription} from 'rxjs';
 
 import {Bill, BillService} from '../shared/services/bill.service';
 import {CurrenciesRates} from "../../shared/types";
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'wfm-bill-page',
@@ -19,7 +20,9 @@ export class BillPageComponent implements OnInit, OnDestroy {
 
   private isLoaded = false;
 
-  constructor(private billService: BillService) {}
+  constructor(private billService: BillService,  private title: Title) {
+    title.setTitle('Счёт');
+  }
 
   ngOnInit() {
     this.subscriptionStart = this.billService

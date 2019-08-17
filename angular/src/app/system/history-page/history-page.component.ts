@@ -7,6 +7,7 @@ import {AppEvent, Category} from "../../shared/types";
 import {CategoriesService} from "../shared/services/categories.service";
 import {EventsService} from "../shared/services/events.service";
 import {unitOfTime} from "moment";
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'wfm-history-page',
@@ -26,7 +27,12 @@ export class HistoryPageComponent implements OnInit, OnDestroy {
 
   isFilterVisible = false;
 
-  constructor(private categoriesService: CategoriesService, private eventsService: EventsService) {
+  constructor(
+    private categoriesService: CategoriesService,
+    private eventsService: EventsService,
+    private title: Title
+  ) {
+    title.setTitle('История');
   }
 
   ngOnInit() {

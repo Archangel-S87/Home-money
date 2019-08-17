@@ -5,6 +5,7 @@ import {Router} from '@angular/router';
 import {UserService} from '../../shared/services/user.service';
 import {User} from "../../shared/types";
 import {LocalStorageService} from "../../shared/services/localStorage.service";
+import {Meta, Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'wfm-registration',
@@ -17,7 +18,18 @@ export class RegistrationComponent implements OnInit {
 
   protected currencies: string[] = [];
 
-  constructor(private userService: UserService, private router: Router) {}
+  constructor(
+    private userService: UserService,
+    private router: Router,
+    private title: Title,
+    private meta: Meta
+  ) {
+    title.setTitle('Регистрация в системе');
+    meta.addTags([
+      {name: 'keywords', content: 'регистрация,система'},
+      {name: 'description', content: 'Страница регистрацмм'}
+    ])
+  }
 
   ngOnInit() {
     this.getCurrencies();

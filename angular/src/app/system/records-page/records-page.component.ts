@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {CategoriesService} from '../shared/services/categories.service';
 import {Category} from "../../shared/types";
+import {Title} from "@angular/platform-browser";
 
 @Component({
   selector: 'wfm-records-page',
@@ -12,7 +13,9 @@ export class RecordsPageComponent implements OnInit {
   isLoaded = false;
   categories: Category[] = [];
 
-  constructor(private categoriesService: CategoriesService) {}
+  constructor(private categoriesService: CategoriesService, private title: Title) {
+    title.setTitle('Записи');
+  }
 
   ngOnInit() {
     this.categoriesService.getCategories()
