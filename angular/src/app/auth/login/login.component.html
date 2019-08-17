@@ -1,5 +1,5 @@
 <p class="text-xs-center">Войдите для работы</p>
-<div class="alert alert-{{message.type}}" *ngIf="message.text">{{message.text}}</div>
+<div class="alert alert-{{message.type}}" @fadeMessage *ngIf="message.text">{{message.text}}</div>
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
     <div
             class="form-group"

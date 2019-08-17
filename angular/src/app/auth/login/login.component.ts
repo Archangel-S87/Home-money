@@ -6,11 +6,13 @@ import {UserService} from '../../shared/services/user.service';
 import {AuthService} from '../../shared/services/auth.service';
 import {Message, User} from "../../shared/types";
 import {LocalStorageService} from "../../shared/services/localStorage.service";
+import {fadeStateTriggerMessage} from "../../shared/animations/fade.animation";
 
 @Component({
     selector: 'wfm-login',
     templateUrl: './login.component.html',
-    styleUrls: ['./login.component.scss']
+    styleUrls: ['./login.component.scss'],
+    animations: [fadeStateTriggerMessage]
 })
 export class LoginComponent implements OnInit {
 
