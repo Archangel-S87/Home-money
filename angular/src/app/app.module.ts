@@ -11,7 +11,6 @@ import {AuthModule} from './auth/auth.module';
 import {AuthService} from './shared/services/auth.service';
 import {AuthGuard} from "./shared/services/auth.guard";
 import {UserService} from './shared/services/user.service';
-import {LocalStorageService} from "./shared/services/localStorage.service";
 
 @NgModule({
   declarations: [
@@ -26,7 +25,7 @@ import {LocalStorageService} from "./shared/services/localStorage.service";
     AppRoutingModule,
     AuthModule
   ],
-  providers: [AuthService, AuthGuard, UserService, LocalStorageService],
+  providers: [AuthService, AuthGuard, UserService],
   bootstrap: [AppComponent],
 })
 export class AppModule {
