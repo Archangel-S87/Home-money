@@ -1,9 +1,9 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
+import {retry} from "rxjs/operators";
 
 import {AuthService} from "../services/auth.service";
-import {delay, retryWhen} from "rxjs/operators";
 
 @Injectable()
 export class BaseApi {
@@ -22,9 +22,7 @@ export class BaseApi {
     url = this.getUrl(url);
     url += this.transformData(data);
 
-    return this.http.get(url).pipe(
-      retryWhen((errorObservable) => errorObservable.pipe(delay(1000))
-    ));
+    return this.http.get(url).pipe(retry(8));
 
   }
 

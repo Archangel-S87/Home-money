@@ -2,3 +2,12 @@
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.form-group label {
+  input.radio {
+    display: none;
+  }
+  input.checkbox {
+    display: none;
+  }
+}

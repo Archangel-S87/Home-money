@@ -9,15 +9,14 @@ RewriteRule ^.htaccess$ - [F]
 Options -Indexes
 
 # Удаляю последний слэш с конца
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.+)/$  /$1 [R=301,L]
+#RewriteCond %{REQUEST_FILENAME} !-d
+#RewriteRule ^(.+)/$  /$1 [R=301,L]
 
-# Перенапрвавить на index.php если в пути есть api
-RewriteCond %{REQUEST_URI} ^/api.*$
-RewriteRule ^api.*$ public/ [L,QSA]
-RewriteRule ^(.*)$ public/app/$1 [L,QSA]
+# Все запросы направить в public_html/
+RewriteCond %{REQUEST_URI} ^.*$
+RewriteRule ^(.*)$ public_html/$1 [L,QSA]
 
-# Разрешаю доступ с localhost-а
+# Разрешаю доступ с localhost
 Header add Access-Control-Allow-Origin: http://localhost:4200
 Header add Access-Control-Allow-Methods: POST,GET,OPTIONS,DELETE,PUT
 Header add Access-Control-Allow-Headers: X-Requested-With,Content-Type,Origin,Authorization,Accept,Client-Security-Token,Accept-Encoding,X-AUTH-TOKEN

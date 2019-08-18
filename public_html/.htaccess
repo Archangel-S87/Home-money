@@ -1,0 +1,15 @@
+AddDefaultCharset utf-8
+RewriteEngine On
+RewriteBase /
+
+# Скрыть файлы
+RewriteRule ^.htaccess$ - [F]
+
+# Н носте должно быть
+#RewriteCond %{REQUEST_URI} ^/api/
+
+RewriteCond %{REQUEST_URI} ^/public_html/api/
+RewriteRule ^ index.php [L,QSA]
+
+RewriteCond %{REQUEST_URI} !index\.php$
+RewriteRule ^(.*)$ app/$1 [L,QSA]
